@@ -1,7 +1,12 @@
-import { Link } from "react-router-dom";
+import { createFileRoute } from '@tanstack/react-router'
+import {  Link } from '@tanstack/react-router'
 import { User, Users, ListCheck } from "lucide-react";
 
-const Index = () => {
+export const Route = createFileRoute('/')({
+  component: Index,
+})
+
+function Index (){
   return (
     <div className="min-h-screen min-w-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-200 via-blue-50 to-white">
       <div className="mb-16 text-center">
@@ -22,7 +27,6 @@ const Index = () => {
           <span className="font-medium">Admin</span>
         </Link>
       </div>
-      <p className="text-xs text-gray-400 italic mt-6">Lovable & Shadcn • Projeto Exemplo</p>
     </div>
   );
 };

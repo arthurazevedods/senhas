@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { createFileRoute } from '@tanstack/react-router'
 
 type Categoria = "REGULAR" | "GESTANTE" | "IDOSO" | "PCD";
 type Senha = { tipo: Categoria, numero: number };
@@ -17,7 +18,11 @@ const corBadge: Record<Categoria, string> = {
   REGULAR: "bg-blue-100 text-blue-700"
 };
 
-export default function AdminPage() {
+export const Route = createFileRoute('/Admin')({
+  component: Admin,
+})
+
+function Admin() {
   const [fila, setFila] = useState<Senha[]>([
     { tipo: "IDOSO", numero: 2 },
     { tipo: "REGULAR", numero: 6 },

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { User, Users, Calendar, ArrowRight } from "lucide-react";
+import { createFileRoute } from '@tanstack/react-router'
+
 
 type Categoria = "REGULAR" | "GESTANTE" | "IDOSO" | "PCD";
 type Senha = { tipo: Categoria, numero: number };
@@ -26,7 +28,11 @@ const icones: Record<Categoria, any> = {
   REGULAR: ArrowRight
 };
 
-export default function ChamadasPage() {
+export const Route = createFileRoute('/Chamadas')({
+  component: ChamadasPage,
+})
+
+function ChamadasPage() {
   // Simulação de chamadas: os mais atuais vêm primeiro
   const [senhasChamadas, setSenhasChamadas] = useState<Senha[]>([
     { tipo: "IDOSO", numero: 2 },

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { User, Users, Calendar, ArrowRight } from "lucide-react";
+import { createFileRoute } from '@tanstack/react-router'
 
 type Categoria = "REGULAR" | "GESTANTE" | "IDOSO" | "PCD";
 
@@ -16,7 +17,11 @@ type Senha = {
   numero: number;
 };
 
-export default function SenhaPage() {
+export const Route = createFileRoute('/Senha')({
+  component: SenhaPage,
+})
+
+function SenhaPage() {
   const [ultimaSenha, setUltimaSenha] = useState<Senha | null>(null);
   const [senhas, setSenhas] = useState<Senha[]>([]);
 
