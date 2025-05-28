@@ -1,27 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
 import { User, Users, Calendar, ArrowRight } from "lucide-react";
 import { createFileRoute } from '@tanstack/react-router'
+import useStore from "@/store/store";
+import type { Category, Ticket } from "@/models/ticket";
+import { useEffect } from "react";
+import { useBroadcastChannelSync } from "@/hooks/useBroadcastChannelSync";
 
-
-type Categoria = "REGULAR" | "GESTANTE" | "IDOSO" | "PCD";
-type Senha = { tipo: Categoria, numero: number };
-
-const cores: Record<Categoria, string> = {
-  GESTANTE: "bg-pink-50 text-pink-700",
-  IDOSO: "bg-yellow-50 text-yellow-800",
-  PCD: "bg-green-50 text-green-700",
-  REGULAR: "bg-blue-50 text-blue-700"
-};
-
-const nomes: Record<Categoria, string> = {
+const nomes: Record<Category, string> = {
   GESTANTE: "Gestante",
   IDOSO: "Idoso",
   PCD: "PCD",
   REGULAR: "Regular"
 };
-
-const icones: Record<Categoria, any> = {
+const cores: Record<Category, string> = {
+  GESTANTE: "bg-pink-100 border-pink-300",
+  IDOSO: "bg-yellow-100 border-yellow-300",
+  PCD: "bg-green-100 border-green-300",
+  REGULAR: "bg-blue-100 border-blue-300",
+};
+const icones: Record<Category, any> = {
   GESTANTE: Calendar,
   IDOSO: User,
   PCD: Users,
@@ -33,21 +30,28 @@ export const Route = createFileRoute('/Chamadas')({
 })
 
 function ChamadasPage() {
-  // Simulação de chamadas: os mais atuais vêm primeiro
-  const [senhasChamadas, setSenhasChamadas] = useState<Senha[]>([
-    { tipo: "IDOSO", numero: 2 },
-    { tipo: "REGULAR", numero: 5 },
-    { tipo: "GESTANTE", numero: 1 },
-    { tipo: "PCD", numero: 1 },
-    { tipo: "REGULAR", numero: 4 },
-    { tipo: "IDOSO", numero: 1 },
-  ]);
+  useBroadcastChannelSync();
+  const setQueue = useStore((state) => state.setQueue);
+  const setChamadas = useStore((state) => state.setChamadas);
+  const chamadas = useStore((state) => state.chamadas);
 
-  const chamadaAtual = senhasChamadas[0];
-  const anteriores = senhasChamadas.slice(1, 6);
+  // Pega a chamada atual e as anteriores
+  const chamadaAtual = chamadas.length > 0 ? chamadas[0] : null;
+  const anteriores = chamadas.slice(1);
 
-  // Get the icon for the main display, if there is one
   const IconAtual = chamadaAtual ? icones[chamadaAtual.tipo] : null;
+
+  // Sincronização entre abas (apenas recebe)
+  useEffect(() => {
+    const channel = new BroadcastChannel("fila-senhas");
+    channel.onmessage = (event) => {
+      if (event.data.type === "UPDATE") {
+        setQueue(event.data.queue);
+        setChamadas(event.data.chamadas);
+      }
+    };
+    return () => channel.close();
+  }, [setQueue, setChamadas]);
 
   return (
     <div className="min-h-screen min-w-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">

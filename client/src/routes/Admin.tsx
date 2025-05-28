@@ -1,18 +1,18 @@
-import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createFileRoute } from '@tanstack/react-router'
 import useStore from "@/store/store";
+import type { Category, Ticket } from "@/models/ticket";
+import { useBroadcastChannelSync } from "@/hooks/useBroadcastChannelSync";
 
-type Categoria = "REGULAR" | "GESTANTE" | "IDOSO" | "PCD";
-type Senha = { tipo: Categoria, numero: number };
-const nomes: Record<Categoria, string> = {
+
+const nomes: Record<Category, string> = {
   GESTANTE: "Gestante",
   IDOSO: "Idoso",
   PCD: "PCD",
   REGULAR: "Regular"
 };
-const corBadge: Record<Categoria, string> = {
+const corBadge: Record<Category, string> = {
   GESTANTE: "bg-pink-100 text-pink-700",
   IDOSO: "bg-yellow-100 text-yellow-800",
   PCD: "bg-green-100 text-green-700",
@@ -24,27 +24,29 @@ export const Route = createFileRoute('/Admin')({
 })
 
 function Admin() {
-  const [fila, setFila] = useState<Senha[]>([
-    { tipo: "IDOSO", numero: 2 },
-    { tipo: "REGULAR", numero: 6 },
-    { tipo: "GESTANTE", numero: 2 },
-    { tipo: "PCD", numero: 1 }
-  ]);
-  const [chamadas, setChamadas] = useState<Senha[]>([]);
+  const channelRef = useBroadcastChannelSync();
+  const fila = useStore((state) => state.queue);
+  const setFila = useStore((state) => state.setQueue);
+  const chamadas = useStore((state) => state.chamadas);
+  const setChamadas = useStore((state) => state.setChamadas);
 
   const chamarProxima = () => {
     if (fila.length > 0) {
-      setChamadas([fila[0], ...chamadas]);
-      setFila(fila.slice(1));
+      const novasChamadas = [fila[0], ...chamadas];
+      const novaFila = fila.slice(1);
+      setChamadas(novasChamadas);
+      setFila(novaFila);
+      channelRef.current?.postMessage({ type: "UPDATE", queue: novaFila, chamadas: novasChamadas });
     }
   };
 
-  const reinserirFila = (senha: Senha) => {
-    setFila([...fila, senha]);
-    setChamadas(chamadas.filter(s => !(s.tipo === senha.tipo && s.numero === senha.numero)));
+  const reinserirFila = (senha: Ticket) => {
+    const novaFila = [...fila, senha];
+    const novasChamadas = chamadas.filter(s => !(s.tipo === senha.tipo && s.numero === senha.numero));
+    setFila(novaFila);
+    setChamadas(novasChamadas);
+    channelRef.current?.postMessage({ type: "UPDATE", queue: novaFila, chamadas: novasChamadas });
   };
-
-  const TicketsList = useStore((state) => state.queue);
 
   return (
     <div className="min-h-screen min-w-screen flex flex-col items-center p-8 bg-gradient-to-br from-yellow-50 to-gray-50 py-10">

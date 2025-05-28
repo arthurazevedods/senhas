@@ -3,6 +3,7 @@ import { User, Users, Calendar, ArrowRight } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 import useStore from "@/store/store";
 import type { Category, Ticket } from "@/models/ticket";
+import { useBroadcastChannelSync } from "@/hooks/useBroadcastChannelSync";
 
 const categorias: { tipo: Category; nome: string; icone: any; cor: string }[] = [
   {
@@ -36,9 +37,10 @@ export const Route = createFileRoute("/Senha")({
 });
 
 function SenhaPage() {
-
+  const channelRef = useBroadcastChannelSync();
   const addTicket = useStore((state) => state.addTicket);
   const ticketsList = useStore((state) => state.queue);
+  const chamadas = useStore((state) => state.chamadas);
 
   const gerarSenha = (tipo: Category) => {
     // Busca o maior número dessa categoria e incrementa
@@ -47,8 +49,10 @@ function SenhaPage() {
       .map((s) => s.numero)
       .reduce((a, b) => Math.max(a, b), 0);
     const novaSenha: Ticket = { tipo, numero: ultNum + 1 };
-    
+
     addTicket(novaSenha);
+    const novaFila = [...ticketsList, novaSenha];
+    channelRef.current?.postMessage({ type: "UPDATE", queue: novaFila, chamadas });
   };
 
   return (
