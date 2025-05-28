@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createFileRoute } from '@tanstack/react-router'
+import useStore from "@/store/store";
 
 type Categoria = "REGULAR" | "GESTANTE" | "IDOSO" | "PCD";
 type Senha = { tipo: Categoria, numero: number };
@@ -42,6 +43,8 @@ function Admin() {
     setFila([...fila, senha]);
     setChamadas(chamadas.filter(s => !(s.tipo === senha.tipo && s.numero === senha.numero)));
   };
+
+  const TicketsList = useStore((state) => state.queue);
 
   return (
     <div className="min-h-screen min-w-screen flex flex-col items-center p-8 bg-gradient-to-br from-yellow-50 to-gray-50 py-10">

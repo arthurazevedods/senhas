@@ -1,65 +1,54 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
 import { User, Users, Calendar, ArrowRight } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 import useStore from "@/store/store";
+import type { Category, Ticket } from "@/models/ticket";
 
-type Categoria = "REGULAR" | "GESTANTE" | "IDOSO" | "PCD";
-
-const categorias: { tipo: Categoria; nome: string; icone: any; cor: string }[] =
-  [
-    {
-      tipo: "GESTANTE",
-      nome: "Gestante",
-      icone: Calendar,
-      cor: "bg-pink-100 border-pink-300",
-    },
-    {
-      tipo: "IDOSO",
-      nome: "Idoso",
-      icone: User,
-      cor: "bg-yellow-100 border-yellow-300",
-    },
-    {
-      tipo: "PCD",
-      nome: "PCD",
-      icone: Users,
-      cor: "bg-green-100 border-green-300",
-    },
-    {
-      tipo: "REGULAR",
-      nome: "Regular",
-      icone: ArrowRight,
-      cor: "bg-blue-100 border-blue-300",
-    },
-  ];
-
-type Senha = {
-  tipo: Categoria;
-  numero: number;
-};
+const categorias: { tipo: Category; nome: string; icone: any; cor: string }[] = [
+  {
+    tipo: "GESTANTE",
+    nome: "Gestante",
+    icone: Calendar,
+    cor: "bg-pink-100 border-pink-300",
+  },
+  {
+    tipo: "IDOSO",
+    nome: "Idoso",
+    icone: User,
+    cor: "bg-yellow-100 border-yellow-300",
+  },
+  {
+    tipo: "PCD",
+    nome: "PCD",
+    icone: Users,
+    cor: "bg-green-100 border-green-300",
+  },
+  {
+    tipo: "REGULAR",
+    nome: "Regular",
+    icone: ArrowRight,
+    cor: "bg-blue-100 border-blue-300",
+  },
+];
 
 export const Route = createFileRoute("/Senha")({
   component: SenhaPage,
 });
 
 function SenhaPage() {
-  const [ultimaSenha, setUltimaSenha] = useState<Senha | null>(null);
-  const [senhas, setSenhas] = useState<Senha[]>([]);
 
-  const newTicket = useStore((state) => state.addPriorite);
-  const nextTicket = useStore((state) => state.queue);
+  const addTicket = useStore((state) => state.addTicket);
+  const ticketsList = useStore((state) => state.queue);
 
-  const gerarSenha = (tipo: Categoria) => {
+  const gerarSenha = (tipo: Category) => {
     // Busca o maior número dessa categoria e incrementa
-    const ultNum = senhas
+    const ultNum = ticketsList
       .filter((s) => s.tipo === tipo)
       .map((s) => s.numero)
       .reduce((a, b) => Math.max(a, b), 0);
-    const novaSenha = { tipo, numero: ultNum + 1 };
-    setSenhas([...senhas, novaSenha]);
-    setUltimaSenha(novaSenha);
-    newTicket(`${tipo[0]}${(ultNum + 1).toString().padStart(3, "0")}`);
+    const novaSenha: Ticket = { tipo, numero: ultNum + 1 };
+    
+    addTicket(novaSenha);
   };
 
   return (
@@ -81,26 +70,33 @@ function SenhaPage() {
               </button>
             ))}
           </div>
-          {ultimaSenha && (
+          {ticketsList && ticketsList.length > 0 && (
             <div className="mt-8 flex flex-col items-center">
               <span className="text-lg text-gray-600">Sua senha:</span>
               <span className="text-4xl font-bold bg-blue-100 px-6 py-2 rounded-lg mt-1 shadow">
-                {ultimaSenha.tipo[0]}
-                {ultimaSenha.numero.toString().padStart(3, "0")}
+                {ticketsList[ticketsList.length - 1].tipo[0]}
+                {ticketsList[ticketsList.length - 1].numero.toString().padStart(3, "0")}
               </span>
               <span className="text-xs text-gray-500 mt-2">
-                {ultimaSenha.tipo.charAt(0) +
-                  ultimaSenha.numero.toString().padStart(3, "0")}
+                {ticketsList[ticketsList.length - 1].tipo.charAt(0) +
+                  ticketsList[ticketsList.length - 1].numero.toString().padStart(3, "0")}
               </span>
             </div>
           )}
         </div>
       </div>
       <div className="absolute left-10 top-10 ">
-        <p>Tamanho da fila:{nextTicket.length}</p>
+        <p>Tamanho da fila: {ticketsList.length}</p>
         <p>
           Próxima senha:
-          {nextTicket.at(0)}
+          {ticketsList.map((ticket) => (
+            <p key={ticket.tipo + ticket.numero}>
+              {ticket.tipo[0]}
+              {ticket.numero.toString().padStart(3, "0")}
+              -
+              {ticket.tipo}
+            </p>
+          ))}
         </p>
       </div>
     </>

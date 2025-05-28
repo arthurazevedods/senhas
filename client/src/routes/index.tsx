@@ -14,15 +14,15 @@ function Index (){
         <p className="mt-2 text-gray-700">Organize e agilize o atendimento do seu consultório!</p>
       </div>
       <div className="flex space-x-8 mb-4">
-        <Link to="/senha" className="flex flex-col items-center bg-white shadow-lg rounded-xl p-6 hover:bg-blue-100 transition">
+        <Link to="/Senha" className="flex flex-col items-center bg-white shadow-lg rounded-xl p-6 hover:bg-blue-100 transition">
           <User className="h-10 w-10 text-blue-500 mb-2" />
           <span className="font-medium">Pegar Senha</span>
         </Link>
-        <Link to="/chamadas" className="flex flex-col items-center bg-white shadow-lg rounded-xl p-6 hover:bg-green-100 transition">
+        <Link to="/Chamadas" className="flex flex-col items-center bg-white shadow-lg rounded-xl p-6 hover:bg-green-100 transition">
           <Users className="h-10 w-10 text-green-500 mb-2" />
           <span className="font-medium">Chamadas</span>
         </Link>
-        <Link to="/admin" className="flex flex-col items-center bg-white shadow-lg rounded-xl p-6 hover:bg-yellow-100 transition">
+        <Link to="/Admin" className="flex flex-col items-center bg-white shadow-lg rounded-xl p-6 hover:bg-yellow-100 transition">
           <ListCheck className="h-10 w-10 text-yellow-500 mb-2" />
           <span className="font-medium">Admin</span>
         </Link>
