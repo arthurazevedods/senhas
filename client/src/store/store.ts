@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Category, Ticket } from '@/models/ticket'
+import type { Ticket } from '@/models/ticket'
 
 type StoreState = {
   queue: Ticket[]
