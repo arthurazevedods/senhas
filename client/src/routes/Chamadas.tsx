@@ -2,7 +2,7 @@
 import { User, Users, Calendar, ArrowRight } from "lucide-react";
 import { createFileRoute } from '@tanstack/react-router'
 import useStore from "@/store/store";
-import type { Category, Ticket } from "@/models/ticket";
+import type { Category } from "@/models/ticket";
 import { useEffect } from "react";
 import { useBroadcastChannelSync } from "@/hooks/useBroadcastChannelSync";
 
